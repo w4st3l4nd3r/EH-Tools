@@ -7,11 +7,24 @@
 #include <memory>
 #include <algorithm>
 
-#ifdef _WIN32
+// *MAC ADDRESS CHANGER*
+// WHAT THIS PROGRAM DOES:
+// Displays the available link/ether interfaces,
+// asks the user to select an interface,
+// displays current MAC address,
+// asks user to enter a new MAC address,
+// changes the MAC address to the new one,
+// and finally displays the new current MAC address.
+//
+// TODO:
+// Currently takes an unrestricted string for new MAC address input. Limit this.
+
+#ifdef _WIN32 
+    // This ifdef is merely to remove errors when viewing the code in Windows,
+    // which doesn't natively recognize popen() / pclose().
     #define popen _popen
     #define pclose _pclose
 #endif
-
 
 std::string chosenInterface = "";
 std::string newMACAddr = "";
@@ -21,15 +34,12 @@ void chooseInterface() {
     std::vector<std::string> interfaceNames;
     std::array<char, 256> buffer;
     
-
     FILE* pipe = popen("ip -o link show", "r");
     if (pipe == nullptr) {
         std::cerr << "Failed to run ip command.\n";
         return;
     }
-
-    std::cout << "Available interfaces:\n";
-    
+    std::cout << "Available interfaces:\n";    
     int index = 0;
     while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
         std::string line = buffer.data();
@@ -43,7 +53,6 @@ void chooseInterface() {
             index++;
         }
     }
-
     pclose(pipe);
 
     if (interfaceNames.empty()) {        
@@ -53,7 +62,6 @@ void chooseInterface() {
 
     int choice;
     bool validChoice = false;
-
     while (validChoice == false) {
         std::cout << "Enter selection: ";
         std::cin >> choice;
