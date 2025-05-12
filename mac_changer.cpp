@@ -1,94 +1,138 @@
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
-#include <ifaddrs.h>
-#include <net/if.h>
 #include <vector>
+#include <regex>
+#include <array>
+#include <memory>
 #include <algorithm>
+
+#ifdef _WIN32
+    #define popen _popen
+    #define pclose _pclose
+#endif
 
 
 std::string chosenInterface = "";
-std::string newMACAdd = "";
+std::string newMACAddr = "";
 
 void chooseInterface() {
 
-    struct ifaddrs* interfaces = nullptr;
-    struct ifaddrs* ifa = nullptr;
+    std::vector<std::string> interfaceNames;
+    std::array<char, 256> buffer;
+    
 
-    if (getifaddrs(&interfaces) == -1) {
-        std::cerr << "getifaddrs() failed.\n";
+    FILE* pipe = popen("ip -o link show", "r");
+    if (pipe == nullptr) {
+        std::cerr << "Failed to run ip command.\n";
+        return;
     }
 
-    std::vector<std::string> interfaceNames;
+    std::cout << "Available interfaces:\n";
     
     int index = 0;
-    std::cout << "Available interfaces:\n";
-    for (ifa = interfaces; ifa != nullptr; ifa = ifa->ifa_next) {
-        if (ifa->ifa_name != nullptr) {
-            std::string name = ifa->ifa_name;
-            if (std::find(interfaceNames.begin(), interfaceNames.end(), name) == interfaceNames.end()) {
-                interfaceNames.push_back(name);
-                std::cout << " [" << index << "] " << name << "\n";
-                ++index;
-            }
+    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+        std::string line = buffer.data();
+
+        std::smatch match;
+        std::regex interfaceRegex(R"(\d+: (\w+):)");
+        if (std::regex_search(line, match, interfaceRegex)) {
+            std::string name = match[1];
+            interfaceNames.push_back(name);
+            std::cout << " [" << index << "] " << name << "\n";
+            index++;
         }
     }
 
-    if (interfaceNames.empty()) {
-        
+    pclose(pipe);
+
+    if (interfaceNames.empty()) {        
         std::cerr << "No interfaces found.\n";
         return;
-
     }
 
     int choice;
-    std::cout << "Enter selection: ";
-    std::cin >> choice;
+    bool validChoice = false;
 
-    if (choice >= 0 && choice < interfaceNames.size()) {
-        chosenInterface = interfaceNames[choice];
-    } else {
-        std::cerr << "Invalid choice.\n";
+    while (validChoice == false) {
+        std::cout << "Enter selection: ";
+        std::cin >> choice;
+
+        if (choice >= 0 && choice < interfaceNames.size()) {
+            chosenInterface = interfaceNames[choice];
+            validChoice = true;
+        } else {
+            std::cerr << "Invalid choice.\n";
+        }
+    }    
+
+}
+
+std::string getMACAddress(const std::string& iface) {
+
+    std::array<char, 256> buffer;
+    std::string result;
+
+    std::string cmd = "ip link show " + iface;
+
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (pipe == nullptr) {
+        std::cerr << "Failed to run command.\n";
+        return "";
+    }
+    while (fgets(buffer.data(), buffer.size(), pipe) != nullptr) {
+        result += buffer.data();
+    }
+    pclose(pipe);
+
+    std::regex MACregex("link/ether ([[:xdigit:]]{2}(:[[:xdigit:]]{2}){5})");
+    std::smatch match;
+    if (std::regex_search(result, match, MACregex)) {
+        return match.str(0);
     }
 
-    freeifaddrs(interfaces);
+    return ""; // No match found.
 
 }
 
-void chooseMACAddress() {
+void displayMACAddress() {
 
-    std::string enteredMAC = "";
+    std::string currentMAC = getMACAddress(chosenInterface);
+    if(!currentMAC.empty()) {
+        std::cout << "Current MAC address: " + getMACAddress(chosenInterface) + "\n";
+    } else {
+        std::cerr << "Could not retrieve MAC address for interface " << chosenInterface << "\n";
+    }    
+
+}
+
+void chooseMACAddress(std::string& nM) {
     
-
-    std::cout << "Current MAC Address is ";
     std::cout << "Enter a new MAC address: ";
-    std::cin >> enteredMAC;
-
-    newMACAdd = enteredMAC;
+    std::cin >> nM;
 
 }
 
-void changeMAC(const std::string& i, const std::string& nM) {
+void changeMAC(const std::string& interf, const std::string& nM) {    
 
-    std::string lineOne = "ifconfig " + i + " down";
-    const char* lineOne_cstr = lineOne.c_str();
+    std::vector<std::string> commands = {
+        "ip link set dev " + interf + " down", 
+        "ip link set dev " + interf + " address " + nM, 
+        "ip link set dev " + interf + " up"};
 
-    std::string lineTwo = "ifconfig " + i + " hw ether " + nM + "";
-    const char* lineTwo_cstr = lineTwo.c_str();
-
-    std::string lineThree = "ifconfig " + i + " up";
-    const char* lineThree_cstr = lineThree.c_str();
-
-    std::system(lineOne_cstr);
-    std::system(lineTwo_cstr);
-    std::system(lineThree_cstr);
+    for (int x = 0; x < commands.size(); x++) {
+        std::system(commands[x].c_str());
+    }
 
 }
 
 int main() {
 
     chooseInterface();
-    chooseMACAddress();
-    changeMAC(chosenInterface, newMACAdd);
+    displayMACAddress();
+    chooseMACAddress(newMACAddr);
+    changeMAC(chosenInterface, newMACAddr);
+    displayMACAddress();
     
     return 0;
 }
