@@ -1,5 +1,4 @@
 // === Network Scanner ===
-// Description:
 // Performs ARP-based scanning on the local network using raw sockets and libpcap.
 // Sends ARP requests to all hosts in the subnet and listens for replies to detect active devices.
 
