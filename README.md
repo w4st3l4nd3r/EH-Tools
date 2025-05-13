@@ -43,3 +43,4 @@ g++ network_scanner.cpp -o network_scanner -lpcap
 sudo ./network_scanner eth0
 ```
 
+![Network Scanner Screenshot](example_images/network_scanner_example.jpg)
