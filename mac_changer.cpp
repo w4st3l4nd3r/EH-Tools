@@ -1,34 +1,24 @@
-#include <cstdlib>
-#include <cstdio>
-#include <iostream>
-#include <vector>
-#include <regex>
-#include <array>
-#include <memory>
+// === MAC Address Changer ===
+// Allows user to select from available interfaces, then changes the MAC address
+// according to what the user defines.
+
 #include <algorithm>
+#include <array>
+#include <cstdio>
+#include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <regex>
+#include <vector>
 
-// *MAC ADDRESS CHANGER*
-// WHAT THIS PROGRAM DOES:
-// Displays the available link/ether interfaces,
-// asks the user to select an interface,
-// displays current MAC address,
-// asks user to enter a new MAC address,
-// changes the MAC address to the new one,
-// and finally displays the new current MAC address.
-//
-// TODO:
-// Currently takes an unrestricted string for new MAC address input. Limit this.
-
-#ifdef _WIN32 
-    // This ifdef is merely to remove errors when viewing the code in Windows,
-    // which doesn't natively recognize popen() / pclose().
+#ifdef _WIN32
     #define popen _popen
     #define pclose _pclose
 #endif
 
+// === SECTION 1: Choose Interface ===
+// Retreives list of local interfaces and lets the user choose from them.
 std::string chosenInterface = "";
-std::string newMACAddr = "";
-
 void chooseInterface() {
 
     std::vector<std::string> interfaceNames;
@@ -76,6 +66,7 @@ void chooseInterface() {
 
 }
 
+// === SECTION 2: Retreive & Display Current MAC ===
 std::string getMACAddress(const std::string& iface) {
 
     std::array<char, 256> buffer;
@@ -102,7 +93,6 @@ std::string getMACAddress(const std::string& iface) {
     return ""; // No match found.
 
 }
-
 void displayMACAddress() {
 
     std::string currentMAC = getMACAddress(chosenInterface);
@@ -114,13 +104,14 @@ void displayMACAddress() {
 
 }
 
+// === SECTION 3: User Input For New MAC Address ===
+std::string newMACAddr = "";
 void chooseMACAddress(std::string& nM) {
     
     std::cout << "Enter a new MAC address: ";
     std::cin >> nM;
 
 }
-
 void changeMAC(const std::string& interf, const std::string& nM) {    
 
     std::vector<std::string> commands = {
@@ -134,6 +125,7 @@ void changeMAC(const std::string& interf, const std::string& nM) {
 
 }
 
+// === SECTION 4: Program Entry ===
 int main() {
 
     chooseInterface();
