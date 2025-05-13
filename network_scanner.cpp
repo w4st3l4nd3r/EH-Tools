@@ -1,38 +1,30 @@
+// === Network Scanner ===
+// Description:
+// Performs ARP-based scanning on the local network using raw sockets and libpcap.
+// Sends ARP requests to all hosts in the subnet and listens for replies to detect active devices.
+
+#include <arpa/inet.h>
+#include <array>
+#include <chrono>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
-#include <cstdint>
-#include <array>
-#include <string>
 #include <cstring>
-#include <iostream>
 #include <iomanip>
-#include <vector>
-#include <arpa/inet.h> // for inet_pton and inet_ntop
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <unistd.h>
+#include <iostream>
 #include <linux/if_packet.h>
 #include <netinet/ether.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
+#include <net/if.h>
 #include <pcap.h>
-#include <chrono>
+#include <string>
+#include <sys/ioctl.h>
+#include <sys/socket.h>
 #include <thread>
+#include <unistd.h>
+#include <vector>
 
-
-// *NETWORK SCANNER*
-// WHAT THIS PROGRAM DOES:
-
-
-
-////////// SECTION 1 ///////////////////////////////////////////////////////////
-// Functions to attain local IP address, utilize the subnet mask to zero out the 
-// last 8 bits of the IP address to obtain the subnet,
-// i.e. 192.168.1.10 ---> 192.168.1.0
-// In order to do this, the dotted IP string must be converted to uint32, have the
-// net mask applied to it to zero out the last 8 bits, then convert the new subnet
-// back into a dotted IP string to be used to generate the list of all IPs to send
-// ARP requests to.
+// --- SECTION 1: Retrieve Local IP Address ===
+// Executes 'hostname -I' and extracts the first IP as a string.
 
 std::string getLocalIPv4Address() {
     std::string localIP;
@@ -56,15 +48,19 @@ std::string getLocalIPv4Address() {
     localIP.erase(localIP.find_last_not_of("\n") + 1);
 
     return localIP;
-
 }
 
+// === Section 2: Local Subnet Discovery & IP Range Generation ===
+// Infers the local subnet from the local IP address and generates an IP list.
+
+// Converts a dotted decimal IP address string to a uint32_t:
 uint32_t convertIPtoINT(const std::string& ip_str) {
     struct in_addr ip_addr;
     inet_pton(AF_INET, ip_str.c_str(), &ip_addr);
     return ntohl(ip_addr.s_addr);
 }
 
+// Converts a uint32_t back to a dotted decimal IP address string:
 std::string convertINTtoIP(uint32_t ip_int) {
     struct in_addr ip_addr;
     ip_addr.s_addr = htonl(ip_int);
@@ -73,6 +69,7 @@ std::string convertINTtoIP(uint32_t ip_int) {
     return std::string(buf);
 }
 
+// Generates all host IPs in a /24 subnet:
 std::vector<std::string> generateIPsInSubnet(const std::string& baseIp) {
     std::vector<std::string> ipList;
     uint32_t base = convertIPtoINT(baseIp) & 0xFFFFFF00; // mask for /24
@@ -83,10 +80,11 @@ std::vector<std::string> generateIPsInSubnet(const std::string& baseIp) {
 
     return ipList;
 }
-////////// END SECTION 1 ///////////////////////////////////////////////////////
-////////// SECTION 2 ///////////////////////////////////////////////////////////
-// This section will craft an ARP packet to be broadcasted.
 
+// === Section 3: Interface Details ===
+// Retrieves details of the host interface for sending the ARP packet.
+
+// Obtains interface index using ioctl:
 int getInterfaceIndex(int socketDescriptor, const std::string& interfaceName) {
     struct ifreq interfaceReq;
     std::strncpy(interfaceReq.ifr_name, interfaceName.c_str(), IF_NAMESIZE);
@@ -97,6 +95,7 @@ int getInterfaceIndex(int socketDescriptor, const std::string& interfaceName) {
     return interfaceReq.ifr_ifindex;
 }
 
+// Obtains the interface's MAC address:
 bool getInterfaceMAC(int socketDescriptor, const std::string& interfaceName, uint8_t* mac) {
     struct ifreq interfaceReq;
     std::strncpy(interfaceReq.ifr_name, interfaceName.c_str(), IF_NAMESIZE);
@@ -108,16 +107,16 @@ bool getInterfaceMAC(int socketDescriptor, const std::string& interfaceName, uin
     return true;
 }
 
-void sendARPRequest(const std::string& interfaceName, const std::string& sourceIPstr, const std::string& targetIPstr) {
-    
-    int socketDescriptor = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP));
+// === SECTION 4: Build and Send ARP Request ===
+// Constructs and sends a single ARP request packet to target IP.
 
-    // Get interface index and MAC:
-    int interfaceIndex = getInterfaceIndex(socketDescriptor, interfaceName);
+void sendARPRequest(const std::string& interfaceName, const std::string& sourceIPstr, const std::string& targetIPstr) {    
+    int socketFileDescriptor = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ARP));
+    int interfaceIndex = getInterfaceIndex(socketFileDescriptor, interfaceName);
     uint8_t sourceMAC[6];
-    if (getInterfaceMAC(socketDescriptor, interfaceName, sourceMAC) == false) {
-        close(socketDescriptor);
-        std::cerr << "Socket closed.\n";
+
+    if (getInterfaceMAC(socketFileDescriptor, interfaceName, sourceMAC) == false) {
+        close(socketFileDescriptor);
         return;
     }
 
@@ -153,20 +152,20 @@ void sendARPRequest(const std::string& interfaceName, const std::string& sourceI
     socketAddress.sll_ifindex = interfaceIndex;
     socketAddress.sll_halen = ETH_ALEN;
     socketAddress.sll_family = AF_PACKET;
-    memset(socketAddress.sll_addr, 0xFF, 6);                    // Broadcast
+    memset(socketAddress.sll_addr, 0xFF, 6);                    
 
-    if (sendto(socketDescriptor, buffer, 42, 0, (struct sockaddr*) &socketAddress, sizeof(socketAddress)) < 0) {
+    if (sendto(socketFileDescriptor, buffer, 42, 0, (struct sockaddr*) &socketAddress, sizeof(socketAddress)) < 0) {
         std::cerr << "sendto failed: " << strerror(errno) << "\n";
     } else {
         std::cout << "ARP request sent to " << targetIPstr << "\n";
     }
 
-    close(socketDescriptor);
+    close(socketFileDescriptor);
 
 }
-////////// END SECTION 2 ///////////////////////////////////////////////////////
-////////// SECTION 3 ///////////////////////////////////////////////////////////
-// This section will listen for, capture and parse an ARP response.
+// === SECTION 5: Listen for ARP Replies ===
+// Use libpcap to capture ARP replies and print sender IP + MAC.
+
 void listenForARPReplies(const std::string& interfaceName, int timeoutMilliseconds = 3000) {
     
     // Open the network interface for packet capture:
@@ -228,9 +227,7 @@ void listenForARPReplies(const std::string& interfaceName, int timeoutMillisecon
     pcap_close(pcapHandle);
 
 }
-////////// END SECTION 3 ///////////////////////////////////////////////////////
-////////// SECTION 4 ///////////////////////////////////////////////////////////
-// Runs the ARP scan on all IPs in the subnet of the host machine.
+// === SECTION 6: Main Orchestration Function ===
 
 void runARPScan(const std::string& interfaceName) {
     
@@ -246,7 +243,7 @@ void runARPScan(const std::string& interfaceName) {
 
     for (const std::string& ip : targets) {
         if (ip == localIP) {
-            continue;           // skip local ip in ARP scan.
+            continue;           // Skip local IP in ARP scan.
         }
         
         sendARPRequest(interfaceName, localIP, ip);
@@ -258,8 +255,8 @@ void runARPScan(const std::string& interfaceName) {
     listenForARPReplies(interfaceName);
 
 }
-////////// END SECTION 3 ///////////////////////////////////////////////////////
 
+// === SECTION 7: Program Entry ===
 
 int main(int argc, char* argv[]) {
 
