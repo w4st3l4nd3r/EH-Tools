@@ -4,6 +4,7 @@ This repository contains networking tools written in modern C++ as part of my pa
 
 ## Tools Included
 ### 1. `mac_changer.cpp` — MAC Address Changer
+
 A command-line tool that allows the user to:
 - View a list of available network interfaces;
 - Select an interface from the list;
@@ -12,7 +13,7 @@ A command-line tool that allows the user to:
 
 **Key Learning:**
 - Parsing shell command output;
-- Using `popen()/pclose()`, `fgets()` and `regex` to process interface data;
+- Using `popen()`/`pclose()`, `fgets()` and `regex` to process interface data.
 
 **Usage:**
 ```bash
@@ -21,3 +22,22 @@ sudo ./mac_changer
 ```
 
 ### 2. `network_scanner.cpp` — ARP-Based Network Scanner
+
+A command-line tool that scans local `/24` subnet for active hosts by:
+- Generating raw ARP request packets using raw sockets;
+- Sending requests to each IP in local subnet;
+- Capturing ARP replies using `libpcap`;
+- Displaying IP and MAC of responding devices.
+
+**Key Learning:**
+- Building raw Ethernet + ARP packets;
+- Using `ioctl()` and `AF_PACKET` sockets;
+- Applying BPF filters with `libpcap`;
+- Understanding subnetting and IP manipulation at the byte level.
+
+**Usage:**
+```bash
+g++ network_scanner.cpp -o network_scanner -lpcap
+sudo ./network_scanner eth0
+```
+
