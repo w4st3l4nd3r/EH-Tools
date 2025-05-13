@@ -21,6 +21,8 @@ g++ mac_changer.cpp -o mac_changer
 sudo ./mac_changer
 ```
 
+![MAC Changer Screenshot](example images/mac_changer_example.jpg)
+
 ### 2. `network_scanner.cpp` — ARP-Based Network Scanner
 
 A command-line tool that scans local `/24` subnet for active hosts by:
