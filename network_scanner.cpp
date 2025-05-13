@@ -1,4 +1,5 @@
 // === Network Scanner ===
+// Description:
 // Performs ARP-based scanning on the local network using raw sockets and libpcap.
 // Sends ARP requests to all hosts in the subnet and listens for replies to detect active devices.
 
@@ -162,6 +163,7 @@ void sendARPRequest(const std::string& interfaceName, const std::string& sourceI
     close(socketFileDescriptor);
 
 }
+
 // === SECTION 5: Listen for ARP Replies ===
 // Use libpcap to capture ARP replies and print sender IP + MAC.
 
@@ -226,6 +228,7 @@ void listenForARPReplies(const std::string& interfaceName, int timeoutMillisecon
     pcap_close(pcapHandle);
 
 }
+
 // === SECTION 6: Main Orchestration Function ===
 
 void runARPScan(const std::string& interfaceName) {
