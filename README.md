@@ -1,6 +1,6 @@
 # Ethical Hacking Tools (C++)
 
-This repository contains networking tools written in modern C++ as part of my path to learning programming and ethical hacking.
+This repository contains networking tools written in modern C++ as part of my path to learning programming and ethical hacking. These projects have given me an understanding of Layer 2 networking (Ethernet/ARP), packet structures, byte manipulation and command-line tool development.
 
 ## Tools Included
 ### 1. `mac_changer.cpp` — MAC Address Changer
@@ -44,3 +44,6 @@ sudo ./network_scanner eth0
 ```
 
 ![Network Scanner Screenshot](example_images/network_scanner_example.jpg)
+
+**Disclaimer:**
+These tools are for educational and testing purposes on networks owned by the operator. Do not use them against systems without explicit permission.
