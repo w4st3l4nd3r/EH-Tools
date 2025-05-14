@@ -2,6 +2,7 @@
 // Performs ARP-based scanning on the local network using raw sockets and libpcap.
 // Sends ARP requests to all hosts in the subnet and listens for replies to detect active devices.
 
+#include <algorithm>
 #include <arpa/inet.h>
 #include <array>
 #include <chrono>
@@ -9,18 +10,25 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
+#include "include/json.hpp"
 #include <iomanip>
 #include <iostream>
 #include <linux/if_packet.h>
 #include <netinet/ether.h>
 #include <net/if.h>
 #include <pcap.h>
+#include <set>
+#include <sstream>
 #include <string>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <thread>
 #include <unistd.h>
+#include <unordered_map>
 #include <vector>
+
+using json = nlohmann::json;
 
 // --- SECTION 1: Retrieve Local IP Address ===
 // Executes 'hostname -I' and extracts the first IP as a string.
@@ -164,10 +172,32 @@ void sendARPRequest(const std::string& interfaceName, const std::string& sourceI
 }
 
 // === SECTION 5: Listen for ARP Replies ===
-// Use libpcap to capture ARP replies and print sender IP + MAC.
+// Use libpcap to capture ARP replies and print sender IP + MAC + Vendor.
 
-void listenForARPReplies(const std::string& interfaceName, int timeoutMilliseconds = 3000) {
-    
+// Load vendor OUI Map:
+std::unordered_map<std::string, std::string> loadOUIMap(const std::string& filename) {
+    std::unordered_map<std::string, std::string> map;
+    std::ifstream file(filename);
+    if (!file) {
+        std::cerr << "Failed to open OUI json file: " << filename << "\n";
+        return map;
+    }
+
+    try {
+        json data = json::parse(file);
+        for (auto& [key, value] : data.items()) {
+            map[key] = value;
+        }
+    } catch (const std::exception& e) {
+        std::cerr << "Failed to parse json: " << e.what() << "\n";
+    }
+
+    return map;
+
+}
+
+void listenForARPReplies(const std::string& interfaceName, int timeoutMilliseconds = 3000) {       
+
     // Open the network interface for packet capture:
     char errorBuffer[PCAP_ERRBUF_SIZE];     // holds errors from pcap
     pcap_t* pcapHandle = pcap_open_live(    
@@ -180,6 +210,7 @@ void listenForARPReplies(const std::string& interfaceName, int timeoutMillisecon
         std::cerr << "pcap_open_live failed: " << errorBuffer << "\n";
         return;
     }
+
 
     // Create and apply a filter to capture only ARP packets:
     struct bpf_program compiledFilterProgram;   
@@ -200,6 +231,8 @@ void listenForARPReplies(const std::string& interfaceName, int timeoutMillisecon
     const u_char* capturedPacket;
     struct pcap_pkthdr* packetHeader;
     int captureResult;
+    std::set<std::string> seenTargets;
+    auto ouiMap = loadOUIMap("data/network_scanner_oui.json");
 
     while ((captureResult = pcap_next_ex(pcapHandle, &packetHeader, &capturedPacket)) >= 0) {
         if (captureResult == 0) {   // Timeout occurred, no packet.
@@ -213,14 +246,33 @@ void listenForARPReplies(const std::string& interfaceName, int timeoutMillisecon
             char senderIPAddress[INET_ADDRSTRLEN];
             inet_ntop(AF_INET, arpPacket->arp_spa, senderIPAddress, sizeof(senderIPAddress));
 
-            std::cout << "Reply from " << senderIPAddress << " - MAC: "
-                << std::hex << std::setfill('0')
-                << std::setw(2) << static_cast<unsigned int>(arpPacket->arp_sha[0]) << ":" // Without casting to unsigned int,
-                << std::setw(2) << static_cast<unsigned int>(arpPacket->arp_sha[1]) << ":" // C++ is treating the MAC bytes as chars, 
-                << std::setw(2) << static_cast<unsigned int>(arpPacket->arp_sha[2]) << ":" // resulting in garbage.
-                << std::setw(2) << static_cast<unsigned int>(arpPacket->arp_sha[3]) << ":"
-                << std::setw(2) << static_cast<unsigned int>(arpPacket->arp_sha[4]) << ":"
-                << std::setw(2) << static_cast<unsigned int>(arpPacket->arp_sha[5]) << "\n";
+            std::ostringstream macStream;
+            for (int i = 0; i < 6; ++i) {
+                macStream << std::hex << std::setw(2) << std::setfill('0')
+                          << static_cast<unsigned int>(arpPacket->arp_sha[i]);
+                if (i < 5) {
+                    macStream << ":";
+                }
+            }
+            std::string macAddressStr= macStream.str();
+            std::string macOUI = macAddressStr.substr(0, 8);
+            std::transform(macOUI.begin(), macOUI.end(), macOUI.begin(), ::toupper);
+
+            // Lookup vendor:
+            std::string vendor = "Unknown";
+            if (ouiMap.count(macOUI)) {
+                vendor = ouiMap[macOUI];
+            }            
+
+            // Ensure only one entry per target:
+            std::string uniqueTarget = std::string(senderIPAddress) + "-" + macAddressStr;
+
+            if (seenTargets.count(uniqueTarget) == true) {
+                continue;
+            }
+            seenTargets.insert(uniqueTarget);
+
+            std::cout << "Reply from " << senderIPAddress << " - MAC: " << macAddressStr << " - Vendor: " << vendor << "\n";
         }
     }
     
