@@ -2,7 +2,6 @@
 
 This repository contains networking tools written in modern C++ as part of my path to learning programming and ethical hacking. These projects have given me an understanding of Layer 2 networking (Ethernet/ARP), packet structures, byte manipulation and command-line tool development.
 
-## Tools Included
 ### 1. `mac_changer.cpp` — MAC Address Changer
 
 A command-line tool that allows the user to:
