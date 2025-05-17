@@ -1,6 +1,6 @@
 // === Sockets Training: Server That Accepts Client Connection and Data ===
 // Sets up an IPv4 socket listening on Port 8080 (through any interface).
-// Accepts client connection and data sent (up to 1KB).
+// Continuously accepts client connections (one at a time) and data received (up to 1KB).
 
 #include <stdio.h>
 #include <iostream>
