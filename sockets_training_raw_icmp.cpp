@@ -3,8 +3,8 @@
 // Listens for a response. Parses response.
 
 #include <arpa/inet.h>
-#include <cstring>
 #include <cstdlib>
+#include <cstring>
 #include <iostream>
 #include <netinet/ip.h>
 #include <netinet/ip_icmp.h>
