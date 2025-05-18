@@ -73,7 +73,7 @@ int main() {
 
     int bytesReceived = recvfrom(socketFileDescriptor, receiveBuffer, sizeof(receiveBuffer), 0, (struct sockaddr*) &senderAddress, &senderLength);
     if (bytesReceived < 0) {
-        std::cerr << "Recvfrom() failed: " << strerror(errno) << std::endl;
+        std::cerr << "Recvfrom() error: " << strerror(errno) << std::endl;
         close(socketFileDescriptor);
         return 1;
     }
