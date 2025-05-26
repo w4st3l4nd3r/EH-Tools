@@ -55,7 +55,7 @@ A worm program that:
 - Remotely executes the newly copied worm, treating the target as a new host from which to propagate and seeking out a seconday target on a separate VLAN.
 
 **Key Learning:**
-- Using `system()` for CL commands;
+- More usage of `system()` for CL commands;
 - More struct `ifaddrs`, `getifaddrs()` and `freeifaddrs()` for obtaining interface data;
 - Extensive use of VMWare for custom VLAN lab setup;
 - Custom Docker container for compiling the worm_WIP.cpp with older libraries (in order to match the older vulnerable target machines);
