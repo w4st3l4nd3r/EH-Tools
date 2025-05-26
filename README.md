@@ -45,5 +45,27 @@ sudo ./network_scanner eth0
 
 ![Network Scanner Screenshot](example_images/network_scanner_example.jpg)
 
+### 3. `worm_WIP.cpp` — Self-Propagating Worm (WORK IN PROGRESS)
+
+A worm program that:
+- Scans local host subnet for potential targets using ARP-based broadcast;
+- Attempts an FTP connection against first target;
+- Copies a version of the worm to the target over FTP;
+- Cleans log files on target system;
+- Remotely executes the newly copied worm, treating the target as a new host from which to propagate and seeking out a seconday target on a separate VLAN.
+
+**Key Learning:**
+- Using `system()` for CL commands;
+- More struct `ifaddrs`, `getifaddrs()` and `freeifaddrs()` for obtaining interface data;
+- Extensive use of VMWare for custom VLAN lab setup;
+- Custom Docker container for compiling the worm_WIP.cpp with older libraries (in order to match the older vulnerable target machines);
+- FTP connection / file sharing.
+
+**Usage:**
+```bash
+g++ worm_WIP.cpp -o worm_WIP
+./worm_WIP
+```
+
 **Disclaimer:**
 These tools are for educational and testing purposes on networks owned by the operator. Do not use them against systems without explicit permission.
