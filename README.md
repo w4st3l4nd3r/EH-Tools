@@ -67,7 +67,7 @@ g++ worm_WIP.cpp -o worm_WIP
 ./worm_WIP
 ```
 
-![Worm Screenshot](example_images/worm_WIP_example.jpg)
+![Worm Screenshot](example_images/worm_example.jpg)
 
 **Disclaimer:**
 These tools are for educational and testing purposes on networks owned by the operator. Do not use them against systems without explicit permission.
