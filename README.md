@@ -48,7 +48,7 @@ sudo ./network_scanner eth0
 ### 3. `worm_WIP.cpp` — Self-Propagating Worm (WORK IN PROGRESS)
 
 A worm program that:
-- Scans local host subnet for potential targets using ARP-based broadcast;
+- Scans local host subnet for potential targets using ping;
 - Attempts an FTP connection against first target;
 - Copies a version of the worm to the target over FTP;
 - Cleans log files on target system;
