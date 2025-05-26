@@ -38,7 +38,7 @@ struct DiscoveredHost {
 };
 
 // === SECTION 1: Network Discovery ===
-// Discover hosts on local network using ARP-Based network scanning
+// Discover hosts on local network using ping
 class NetworkDiscoverModule {
 
     private:
