@@ -73,7 +73,8 @@ class NetworkDiscoverModule {
     public:
     std::vector<DiscoveredHost> discoverLiveHosts() {
         std::vector<DiscoveredHost> liveHosts;
-        std::mutex hostMutex; // Protects liveHosts
+        // std::mutex hostMutex; // Protects liveHosts
+        // TODO: Continue with multi-threading implementation
 
         std::string interfaceName = "ens35";                         // Update to match VM network interface
         std::string localIP = getLocalIPAddress(interfaceName);
