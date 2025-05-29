@@ -1,4 +1,4 @@
-# Ethical Hacking Tools (C++)
+# Networking and Ethical Hacking Tools (C++)
 
 This repository contains networking tools written in modern C++ as part of my path to learning programming and ethical hacking. These projects have given me an understanding of Layer 2 networking (Ethernet/ARP), packet structures, byte manipulation and command-line tool development.
 
