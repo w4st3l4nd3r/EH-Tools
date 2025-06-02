@@ -4,7 +4,7 @@
 This repository contains a simple TCP server that echoes any messages sent from the client over port 8080.
 
 **Key Learning:**
-- More socket creation utilizing `socket()`, `connect()`, `accept()`, `listen()`, `send()`, etc.
+- More socket creation utilizing `socket()`, `connect()`, `accept()`, `listen()`, `send()`, `recv()` etc.
 
 **Usage:**
 ```bash
