@@ -10,6 +10,8 @@ This repository contains a simple TCP server that echoes any messages sent from 
 ```bash
 g++ tcp_server.cpp -o tcp_server
 sudo ./tcp_server
+g++ tcp_client.cpp -o tcp_client
+sudo ./tcp_client
 ```
 
 ![tcp_echo_server_client_screenshot](tcp_echo_server_client.JPG)
