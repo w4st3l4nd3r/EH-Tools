@@ -32,6 +32,7 @@ class ClientSocket {
     }
 
     void closeSocket() {
+        std::cout << "Shutting down client socket..." << std::endl;
         close(clientSocketFileDescriptor);
         return;
     }
@@ -78,6 +79,7 @@ class Client {
         char serverMessage[1024];
         int bytesReceived = recv(clientSocket.getCSFD(), serverMessage, sizeof(serverMessage), 0);
         if (bytesReceived > 0) {
+            serverMessage[bytesReceived] = '\0'; // Clean up garbage characters after message
             std::cout << "Received " << bytesReceived << " bytes: " << serverMessage << std::endl;
         } else if (bytesReceived == 0) {
             std::cout << "Server disconnected without replying with any data." << std::endl;
