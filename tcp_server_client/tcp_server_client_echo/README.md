@@ -1,5 +1,5 @@
 
-# TCP Echo Server/Client
+# TCP Echo Server/Client (C++)
 
 This repository contains a simple TCP server that echoes any messages sent from the client over port 8080.
 
