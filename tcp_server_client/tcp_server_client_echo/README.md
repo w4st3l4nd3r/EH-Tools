@@ -12,4 +12,4 @@ g++ tcp_server.cpp -o tcp_server
 sudo ./tcp_server
 ```
 
-![MAC Changer Screenshot](example_images/mac_changer_example.jpg)
+![tcp_echo_server_client_screenshot](tcp_echo_server_client.JPG)
