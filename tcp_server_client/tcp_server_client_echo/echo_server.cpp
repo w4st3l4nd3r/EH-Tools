@@ -1,113 +1,166 @@
-// === TCP ECHO CLIENT ===
-// This simple TCP client sends a message to a localhost server on port 8080.
-// It then receives the message echoed back at it.
+// === TCP ECHO SERVER ===
+// This simple TCP server listens for a localhost client connection on port 8080.
+// It then receives a client message which it then echoes back to the client.
 
-#include <arpa/inet.h>
+#include <stdio.h>
 #include <iostream>
 #include <signal.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <arpa/inet.h>
 
-// Build client socket:
+// Class for creation and binding of the server socket:
+class ServerSocket {
+    private:
+    int serverSocketFileDescriptor;
+    struct sockaddr_in serverSocketAddress;
+    socklen_t serverSize = sizeof(serverSocketAddress);   
+
+    public:
+    ServerSocket(){};
+    ~ServerSocket(){};
+
+    int getSSFD() {
+        return serverSocketFileDescriptor;
+    }
+
+    bool initialize() {
+        serverSocketFileDescriptor = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+        if (serverSocketFileDescriptor == -1) {
+            std::cerr << "[!] socket() failed to initialize: " << strerror(errno) << std::endl;
+            return false;
+        }
+
+        int opt = 1;
+        setsockopt(serverSocketFileDescriptor, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
+        serverSocketAddress.sin_family = AF_INET;                  
+        serverSocketAddress.sin_addr.s_addr = INADDR_ANY;          
+        serverSocketAddress.sin_port = htons(8080);                
+
+        if (bind(serverSocketFileDescriptor, (struct sockaddr*) &serverSocketAddress, serverSize) == -1) {
+            std::cerr << "[!] bind() failed to initialize: " << strerror(errno) << std::endl;
+            closeServerSocket();
+            return false;
+        }
+
+        return true;
+    }
+
+    void closeServerSocket() {
+        std::cout << "Shutting down server socket..." << std::endl;
+        close(serverSocketFileDescriptor);
+        return;
+    }
+};
+
+// Class for creation of the client socket, accepting/receiving data from said
+// client, and then echoing the client message back to the client:
 class ClientSocket {
-
-    int clientSocketFileDescriptor;
+    private:
+    int clientSocketFileDescriptor = 0;
+    struct sockaddr_in clientSocketAddress;
+    socklen_t clientSize = sizeof(clientSocketAddress);
 
     public:
     ClientSocket(){};
-    ~ClientSocket(){};
+    ~ClientSocket() {
+        closeClientSocket();
+    }
 
-    void initialize() {
-        clientSocketFileDescriptor = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-        if (clientSocketFileDescriptor == -1) {
-            std::cerr << "[!] socket() initialization failed: " << strerror(errno) << std::endl;
-            return;
+    void initialize(int SSFD) {
+        int numConnections = 0;         // Limit total connections before closing server.
+        while (numConnections < 1) {    // Connections limited to one (adjust accordingly).
+            clientSocketFileDescriptor = accept(SSFD, (struct sockaddr*) &clientSocketAddress, &clientSize);
+            if (clientSocketFileDescriptor == -1) {
+                std::cerr << "[!] accept() failed to initialize: " << strerror(errno) << std::endl;
+                continue;
+            }
+
+            char clientIP[INET_ADDRSTRLEN];
+            inet_ntop(AF_INET, &clientSocketAddress.sin_addr, clientIP, INET_ADDRSTRLEN);
+
+            std::cout << "Client connected from " << clientIP << ":" << ntohs(clientSocketAddress.sin_port) << std::endl;
+
+            // Receive data from client:
+            char clientMessage[1024];
+            char serverMessage[1024];
+            memset(clientMessage, 0, sizeof(clientMessage));
+            memset(serverMessage, 0, sizeof(serverMessage));
+
+            int bytesReceived = recv(clientSocketFileDescriptor, clientMessage, sizeof(clientMessage) -1, 0);
+            if (bytesReceived > 0) {
+                std::cout << "Received " << bytesReceived << " bytes: " << clientMessage << std::endl;
+                // Echo message back to client:
+                strncpy(serverMessage, clientMessage, sizeof(clientMessage));
+                int bytesSent = send(clientSocketFileDescriptor, serverMessage, bytesReceived, 0);
+                if (bytesSent > 0) {
+                    std::cout << "Sent " << bytesSent << " bytes: " << serverMessage << std::endl;
+                } else {
+                    std::cerr << "[!] Server send() failure: " << strerror(errno) << std::endl;
+                }            
+            } else if (bytesReceived == 0) {
+                std::cout << "Client disconnected without sending data." << std::endl;
+            } else {
+                std::cerr << "[!] recv() failed to initialize: " << strerror(errno) << std::endl;
+            }
+
+            closeClientSocket();
+            std::cout << "Connection closed." << std::endl;
+
+            numConnections++;
         }
     }
 
-    int getCSFD() {
-        return clientSocketFileDescriptor;
-    }
-
-    void closeSocket() {
-        std::cout << "Shutting down client socket..." << std::endl;
+    void closeClientSocket() {
         close(clientSocketFileDescriptor);
         return;
     }
 };
 
-// Build Client class to utilize socket, establish a server socket address,
-// connect to server, and send/receive payload:
-class Client {
-    private:
-    ClientSocket clientSocket;
-    struct sockaddr_in serverSocketAddress;
-
-    void setupServerSocketAddress() {
-        serverSocketAddress.sin_family = AF_INET;
-        serverSocketAddress.sin_port = htons(8080);
-
-        if (inet_pton(AF_INET, "127.0.0.1", &serverSocketAddress.sin_addr) <= 0) {
-            std::cerr << "[!] Invalid server IP address." << std::endl;
-            clientSocket.closeSocket();
-            return;
-        }
-    }
-
-    void connectToServer() {
-        if (connect(clientSocket.getCSFD(), (struct sockaddr*) &serverSocketAddress, sizeof(serverSocketAddress)) == -1) {
-            std::cerr << "[!] connect() failure: " << strerror(errno) << std::endl;
-            clientSocket.closeSocket();
-        }
-    }
-
-    void sendMessageToServer() {
-        const char* clientMessage = "Hello from client.";
-        int bytesSent = send(clientSocket.getCSFD(), clientMessage, strlen(clientMessage), 0);
-        if (bytesSent < 0) {
-            std::cerr << "[!] send() failure: " << strerror(errno) << std::endl;
-            clientSocket.closeSocket();
-            return;
-        }
-
-        std::cout << "Sent " << bytesSent << " bytes to server." << std::endl;
-    }
-
-    void receiveMessageFromServer() {
-        char serverMessage[1024];
-        int bytesReceived = recv(clientSocket.getCSFD(), serverMessage, sizeof(serverMessage), 0);
-        if (bytesReceived > 0) {
-            serverMessage[bytesReceived] = '\0'; // Clean up garbage characters after message
-            std::cout << "Received " << bytesReceived << " bytes: " << serverMessage << std::endl;
-        } else if (bytesReceived == 0) {
-            std::cout << "Server disconnected without replying with any data." << std::endl;
-        } else {
-            std::cerr << "[!] recv() failure: " << strerror(errno) << std::endl;
-        }
-    }
-    
+// Class for the server, itself, utilizing the ServerSocket and ClientSocket classes:
+class Server {
     public:
-    Client(){};
-    ~Client() {
-        clientSocket.closeSocket();
+    ServerSocket serverSocket;
+    ClientSocket clientSocket;
+
+    Server(){};
+    ~Server() {
+        serverSocket.closeServerSocket();
+        clientSocket.closeClientSocket();        
     }
 
-    void initialize() {
-        clientSocket.initialize();
-        setupServerSocketAddress();
-        connectToServer();
-        sendMessageToServer();
-        receiveMessageFromServer();        
+    void createServerSocket() {
+        if(serverSocket.initialize() == false) {
+            std::cerr << "[!] Failed to initialize server socket. Exiting." << std::endl;
+            exit(EXIT_FAILURE);
+        }
+    }
+    void createClientSocket() {
+        clientSocket.initialize(serverSocket.getSSFD());
+    }
+
+    void listenForClients() {
+        // Listen for incoming connections:
+        if (listen(serverSocket.getSSFD(), 5) == -1) {
+            std::cerr << "[!] listen() failed to initialize: " << strerror(errno) << std::endl;
+            serverSocket.closeServerSocket();
+            return;
+        }
+
+        std::cout << "Server listening on port 8080..." << std::endl;
     }
 };
 
 // Program entry:
 int main() {
 
-    Client client;
-    client.initialize();
+    Server server;
+
+    server.createServerSocket();
+    server.listenForClients();
+    server.createClientSocket();
 
     return 0;
 }
