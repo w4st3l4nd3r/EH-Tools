@@ -5,7 +5,6 @@ This repository contains a simple TCP server that echoes any messages sent from 
 
 **Key Learning:**
 - More socket creation utilizing `socket()`, `connect()`, `accept()`, `listen()`, `send()`, etc.
-- 
 
 **Usage:**
 ```bash
@@ -13,4 +12,4 @@ g++ tcp_server.cpp -o tcp_server
 sudo ./tcp_server
 ```
 
-![tcp_echo_server_client](example_images/tcp_echo_server_client.JPG)
+![MAC Changer Screenshot](example_images/mac_changer_example.jpg)
