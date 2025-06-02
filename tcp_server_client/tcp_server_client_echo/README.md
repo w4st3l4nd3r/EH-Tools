@@ -13,4 +13,4 @@ g++ tcp_server.cpp -o tcp_server
 sudo ./tcp_server
 ```
 
-![tcp_echo_server_client Screenshot](example_images/tcp_echo_server_client.JPG)
+![tcp_echo_server_client](example_images/tcp_echo_server_client.JPG)
