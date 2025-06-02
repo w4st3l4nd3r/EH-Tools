@@ -9,8 +9,8 @@ This repository contains a simple TCP server that echoes any messages sent from 
 **Usage:**
 ```bash
 g++ tcp_server.cpp -o tcp_server
-sudo ./tcp_server
 g++ tcp_client.cpp -o tcp_client
+sudo ./tcp_server
 sudo ./tcp_client
 ```
 
