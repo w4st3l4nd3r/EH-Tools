@@ -14,6 +14,6 @@ A command-line based TCP chatroom that:
 ```bash
 g++ -pthread tcp_chatroom_server.cpp -o chatroom_server
 g++ -pthread tcp_chatroom_client.cpp -o chatroom_client
-./tcp_server
-./tcp_client
+./chatroom_server
+./chatroom_client
 ```
