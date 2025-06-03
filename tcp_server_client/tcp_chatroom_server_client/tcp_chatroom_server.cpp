@@ -4,7 +4,7 @@
 
 // TODO:
 // Add usernames
-// Echo messages to all clients
+// Add /kick, /list admin controls
 
 #include <algorithm>
 #include <arpa/inet.h>
@@ -96,6 +96,38 @@ class ClientSocket {
         }
     }
 
+    void adminCommandLoop() {
+        std::string command;
+        while (true) {
+            std::getline(std::cin, command);
+
+            if (command == "/list") {
+                std::lock_guard<std::mutex> lock(clientMutex);
+                std::cout << "[*] Active clients:" << std::endl;
+                for (int fd : activeClientsSFD) {
+                    std::cout << fd << std::endl;
+                }
+            } else if (command.substr(0, 6) == "/kick ") {
+                int targetFD = std::stoi(command.substr(6));
+                std::lock_guard<std::mutex> lock(clientMutex);
+                auto it = std::find(activeClientsSFD.begin(), activeClientsSFD.end(), targetFD);
+                if (it != activeClientsSFD.end()) {
+                    std::cout << "[!] Kicking client FD " << targetFD << std::endl;
+                    std::string kickNotice = "[SERVER] You have been kicked.\n";
+                    send(targetFD, kickNotice.c_str(), kickNotice.size(), 0);
+                    shutdown(targetFD, SHUT_RDWR);
+                    close(targetFD);
+                    activeClientsSFD.erase(it);
+                } else {
+                    std::cout << "[!] No such client FD: " << targetFD << std::endl;
+                }
+            }
+            else {
+                std::cout << "[!] No such command." << std::endl;
+            }
+        }
+    }
+
     public:
     ClientSocket(){};
     ~ClientSocket() {
@@ -107,6 +139,9 @@ class ClientSocket {
             clientSocketFileDescriptor = 0;
             struct sockaddr_in clientSocketAddress;
             socklen_t clientSize = sizeof(clientSocketAddress);
+
+            std::thread adminThread(&ClientSocket::adminCommandLoop, this);
+            adminThread.detach();
 
             clientSocketFileDescriptor = accept(SSFD, (struct sockaddr*) &clientSocketAddress, &clientSize);
             if (clientSocketFileDescriptor == -1) {
