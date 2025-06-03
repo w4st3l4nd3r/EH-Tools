@@ -4,10 +4,10 @@ A command-line based TCP chatroom that:
 - Utilizes muilt-threading to accept multiple concurrent clients;
 - Broadcasts all messages sent by clients to all other clients;
 - Allows graceful client exit with `/exit`;
-- Allows administrator commands `/kick` a client or `/list` list all connected clients.
+- Allows administrator commands to `/kick` a client or `/list` list all connected clients.
 
 **Key Learning:**
-- Multi-threading (`std::thread`) and thread safety (`std::mutex`);
+- Multi-threading (`std::thread`) and thread safety (`std::mutex` / `std::lock_guard`);
 - More work with socket creation and management.
 
 **Usage:**
