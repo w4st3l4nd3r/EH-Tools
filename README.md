@@ -7,10 +7,10 @@ This repository contains networking tools written in modern C++ as part of my pa
 - TCP Multi-client Chatroom
 - TCP File Transfer
 
-## Scanners
+## Scanning
 - ARP-based Network Scanner
 
-## Spoofers
+## Spoofing
 - MAC Address Changer
 
 **Disclaimer:**
