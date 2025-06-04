@@ -7,7 +7,7 @@ This repository contains simple TCP server/client programs.
 `echo_server.cpp` `echo_client.cpp`
 
 A command-line tool that:
-- Runs a server that accepts localhost client socket connection;
+- Runs a server that accepts client socket connection;
 - Receives messages from client, then echoes the message back to the client.
 
 **Key Learning:**
