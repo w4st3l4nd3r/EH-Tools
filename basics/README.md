@@ -15,10 +15,10 @@ A command-line tool that:
 
 **Usage:**
 ```bash
-g++ tcp_server.cpp -o tcp_server
-g++ tcp_client.cpp -o tcp_client
-sudo ./tcp_server
-sudo ./tcp_client
+g++ echo_server.cpp -o echo_server
+g++ echo_client.cpp -o echo_client
+./echo_server
+./echo_client
 ```
 
 ![echo_server_client_screenshot](echo_server_client_example.jpg)
