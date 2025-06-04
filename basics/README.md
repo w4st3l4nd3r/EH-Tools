@@ -38,8 +38,8 @@ A command-line based TCP chatroom that:
 
 **Usage:**
 ```bash
-g++ -pthread tcp_chatroom_server.cpp -o chatroom_server
-g++ -pthread tcp_chatroom_client.cpp -o chatroom_client
+g++ -pthread chatroom_server.cpp -o chatroom_server
+g++ -pthread chatroom_client.cpp -o chatroom_client
 ./chatroom_server
 ./chatroom_client
 ```
