@@ -21,7 +21,7 @@ sudo ./tcp_server
 sudo ./tcp_client
 ```
 
-![tcp_echo_server_client_screenshot](echo_server_client_example.jpg)
+![echo_server_client_screenshot](echo_server_client_example.jpg)
 
 ### 2. TCP Multi-client Chatroom (C++)
 `chatroom_server.cpp` `chatroom_client.cpp`
@@ -43,3 +43,4 @@ g++ -pthread tcp_chatroom_client.cpp -o chatroom_client
 ./chatroom_server
 ./chatroom_client
 ```
+![chatroom_server_client_screenshot](chatroom_example.jpg)
