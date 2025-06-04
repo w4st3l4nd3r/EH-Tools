@@ -45,3 +45,25 @@ g++ -pthread chatroom_client.cpp -o chatroom_client
 ```
 
 ![chatroom_server_client_screenshot](chatroom_server_client_example.jpg)
+
+### 3. TCP File Transfer (C++)
+`file_transfer_server.cpp` `file_transfer_client.cpp`
+
+A command-line based TCP file transfer program that:
+- Opens a connection between a server and a client on port 8080;
+- Client asks user to designate a local file to transfer;
+- Client extracts metadata from local file and sends metadata + file to server;
+- Server receives metadata and file and saves to local disk.
+
+**Key Learning:**
+- Stream functions like `fopen()`, `fclose()`, `fseek()`, `ftell()`, `rewind()` and `fread()`.
+
+**Usage:**
+```bash
+g++ file_transfer_server.cpp -o file_transfer_server
+g++ file_transfer_client.cpp -o file_transfer_client
+./file_transfer_server
+./file_transfer_client
+```
+
+![chatroom_server_client_screenshot](file_transfer_server_client_example.jpg)
