@@ -2,6 +2,7 @@
 // This is a simple TCP chatroom client that connects to the TCP chatroom server and
 // receives messages sent from other connected clients.
 
+// Currently hardcoded for "127.0.0.1" localhost connections.
 
 #include <arpa/inet.h>
 #include <cstring>
