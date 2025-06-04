@@ -1,4 +1,5 @@
-### 1. `arp_scanner.cpp` — ARP-Based Network Scanner
+### 1. ARP-Based Network Scanner
+`arp_scanner.cpp`
 
 A command-line tool that scans local `/24` subnet for active hosts by:
 - Generating raw ARP request packets using raw sockets;
