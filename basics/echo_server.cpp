@@ -1,6 +1,8 @@
 // === TCP ECHO SERVER ===
-// This simple TCP server listens for a localhost client connection on port 8080.
+// This simple TCP server listens for a client connection on port 8080.
 // It then receives a client message which it then echoes back to the client.
+
+// Currently hardcoded for "127.0.0.1" localhost connections.
 
 #include <stdio.h>
 #include <iostream>
@@ -10,7 +12,6 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-// Class for creation and binding of the server socket:
 class ServerSocket {
     private:
     int serverSocketFileDescriptor;
