@@ -2,6 +2,8 @@
 // This program runs a server to accept file transfers from connected clients,
 // then writes them to the local disk.
 
+// Currently hardcoded for "127.0.0.1" localhost connections.
+
 #include <algorithm>
 #include <arpa/inet.h>
 #include <iostream>
