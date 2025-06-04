@@ -44,4 +44,4 @@ g++ -pthread tcp_chatroom_client.cpp -o chatroom_client
 ./chatroom_client
 ```
 
-![chatroom_server_client_screenshot](chatroom_example.jpg)
+![chatroom_server_client_screenshot](chatroom_server_client_example.jpg)
