@@ -51,9 +51,9 @@ g++ -pthread chatroom_client.cpp -o chatroom_client
 
 A command-line based TCP file transfer program that:
 - Opens a connection between a server and a client on port 8080;
-- Client asks user to designate a local file to transfer;
-- Client extracts metadata from local file and sends metadata + file to server;
-- Server receives metadata and file and saves to local disk.
+- Asks user to designate a local file to transfer;
+- Extracts metadata from local client file and sends metadata + file to server;
+- Receives metadata and file and saves to local server disk.
 
 **Key Learning:**
 - Stream functions like `fopen()`, `fclose()`, `fseek()`, `ftell()`, `rewind()` and `fread()`.
