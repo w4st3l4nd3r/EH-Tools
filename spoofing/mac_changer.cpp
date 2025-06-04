@@ -62,7 +62,8 @@ void chooseInterface() {
         } else {
             std::cerr << "Invalid choice.\n";
         }
-    }  
+    }    
+
 }
 
 // === SECTION 2: Retreive & Display Current MAC ===
