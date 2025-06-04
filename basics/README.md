@@ -3,7 +3,7 @@
 
 This repository contains simple TCP server/client programs.
 
-### 1. TCP Echo Server/Client (C++)
+### 1. TCP Echo (C++)
 `echo_server.cpp` `echo_client.cpp`
 
 A command-line tool that:
