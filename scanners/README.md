@@ -20,4 +20,4 @@ g++ -lpcap arp_scanner.cpp -o arp_scanner
 sudo ./arp_scanner <interface>
 ```
 
-![arp_scanner_screenshot](arp_scanner_example.jpg)
+![arp_scanner_screenshot](arp_network_scanner_example.jpg)
