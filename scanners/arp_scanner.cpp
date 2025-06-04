@@ -232,7 +232,7 @@ void listenForARPReplies(const std::string& interfaceName, int timeoutMillisecon
     struct pcap_pkthdr* packetHeader;
     int captureResult;
     std::set<std::string> seenTargets;
-    auto ouiMap = loadOUIMap("data/network_scanner_oui.json");
+    auto ouiMap = loadOUIMap("arp_scanner_oui.json");
 
     while ((captureResult = pcap_next_ex(pcapHandle, &packetHeader, &capturedPacket)) >= 0) {
         if (captureResult == 0) {   // Timeout occurred, no packet.
