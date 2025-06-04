@@ -1,5 +1,5 @@
 // === TCP ECHO SERVER ===
-// This simple TCP server listens for a client connection on port 8080.
+// This simple TCP server listens for a localhost client connection on port 8080.
 // It then receives a client message which it then echoes back to the client.
 
 // Currently hardcoded for "127.0.0.1" localhost connections.
@@ -56,8 +56,6 @@ class ServerSocket {
     }
 };
 
-// Class for creation of the client socket, accepting/receiving data from said
-// client, and then echoing the client message back to the client:
 class ClientSocket {
     private:
     int clientSocketFileDescriptor = 0;
@@ -84,7 +82,6 @@ class ClientSocket {
 
             std::cout << "Client connected from " << clientIP << ":" << ntohs(clientSocketAddress.sin_port) << std::endl;
 
-            // Receive data from client:
             char clientMessage[1024];
             char serverMessage[1024];
             memset(clientMessage, 0, sizeof(clientMessage));
@@ -93,7 +90,6 @@ class ClientSocket {
             int bytesReceived = recv(clientSocketFileDescriptor, clientMessage, sizeof(clientMessage) -1, 0);
             if (bytesReceived > 0) {
                 std::cout << "Received " << bytesReceived << " bytes: " << clientMessage << std::endl;
-                // Echo message back to client:
                 strncpy(serverMessage, clientMessage, sizeof(clientMessage));
                 int bytesSent = send(clientSocketFileDescriptor, serverMessage, bytesReceived, 0);
                 if (bytesSent > 0) {
@@ -120,7 +116,6 @@ class ClientSocket {
     }
 };
 
-// Class for the server, itself, utilizing the ServerSocket and ClientSocket classes:
 class Server {
     public:
     ServerSocket serverSocket;
@@ -143,7 +138,6 @@ class Server {
     }
 
     void listenForClients() {
-        // Listen for incoming connections:
         if (listen(serverSocket.getSSFD(), 5) == -1) {
             std::cerr << "[!] listen() failed to initialize: " << strerror(errno) << std::endl;
             serverSocket.closeServerSocket();
@@ -154,7 +148,6 @@ class Server {
     }
 };
 
-// Program entry:
 int main() {
 
     Server server;
