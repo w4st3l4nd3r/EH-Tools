@@ -1,10 +1,10 @@
 // === TCP CHATROOM SERVER ===
-// This simple TCP chatroom server that listens for a localhost client connections on port 8080.
-// It then receives a client messages which it then echoes back to all clients.
+// This simple TCP chatroom server listens for client connections on port 8080.
+// It then receives client messages which it broadcasts back to all connected clients.
+// Server Commands: /kick <fd>, /list
+// Client Commands: /exit
 
-// TODO:
-// Add usernames
-// Add /kick, /list admin controls
+// Currently hardcoded for "127.0.0.1" localhost connections.
 
 #include <algorithm>
 #include <arpa/inet.h>
