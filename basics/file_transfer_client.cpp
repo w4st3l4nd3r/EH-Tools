@@ -2,6 +2,8 @@
 // This client reads a file from disk, extracts it, connects to server,
 // and then sends file to the server.
 
+// Currently hardcoded for "127.0.0.1" localhost connections.
+
 #include <algorithm>
 #include <arpa/inet.h>
 #include <iostream>
