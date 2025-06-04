@@ -16,8 +16,8 @@ A command-line tool that scans local `/24` subnet for active hosts by:
 
 **Usage:**
 ```bash
-g++ network_scanner.cpp -o network_scanner -lpcap
-sudo ./network_scanner eth0
+g++ -lpcap arp_scanner.cpp -o arp_scanner
+sudo ./arp_scanner <interface>
 ```
 
 ![arp_scanner_screenshot](arp_scanner_example.jpg)
