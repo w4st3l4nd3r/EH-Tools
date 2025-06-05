@@ -33,12 +33,12 @@ class ICMPPacket {
 
     public:
     ICMPPacket(){  
-        memset((void*) &packet, 0, sizeof(packet));
+        memset(packet.data(), 0, sizeof(packet));
     };
     ~ICMPPacket(){};
     
     void craftPacket() {
-        struct icmphdr* icmpHeaderSent = (struct icmphdr*) (void*) &packet;
+        struct icmphdr* icmpHeaderSent = (struct icmphdr*) packet.data();
         icmpHeaderSent->type = ICMP_ECHO;
         icmpHeaderSent->code = 0;
         icmpHeaderSent->un.echo.id = getpid() & 0xFFFF;
@@ -49,7 +49,7 @@ class ICMPPacket {
         memcpy(payloadStart, payload, strlen(payload));
         
         icmpHeaderSent->checksum = 0;
-        icmpHeaderSent->checksum = calculateCheckSum((uint16_t*) (void*) &packet, sizeof(icmphdr) + strlen(payload));
+        icmpHeaderSent->checksum = calculateCheckSum((uint16_t*) packet.data(), sizeof(icmphdr) + strlen(payload));
     }
 
     std::array<char, 64> getPacket() {
@@ -98,7 +98,7 @@ class DestinationSocket {
     void captureICMPResponse() {
         socklen_t senderLength = sizeof(senderAddress);
 
-        int bytesReceived = recvfrom(destinationSocketFileDescriptor, (void*) &receiveBuffer, sizeof(receiveBuffer), 0,
+        int bytesReceived = recvfrom(destinationSocketFileDescriptor, receiveBuffer.data(), sizeof(receiveBuffer), 0,
             (struct sockaddr*) &senderAddress, &senderLength);
         if (bytesReceived < 0) {
             std::cerr << "Capture ICMP response recvfrom() failure: " << strerror(errno) << std::endl;
@@ -110,7 +110,7 @@ class DestinationSocket {
     }
     
     void parseAndDisplayResponse() {
-        struct iphdr* ipHeader = (struct iphdr*) (void*) &receiveBuffer;
+        struct iphdr* ipHeader = (struct iphdr*) receiveBuffer.data();
         int ipHeaderLength = ipHeader->ihl * 4; 
 
         struct icmphdr* icmpHeaderReceived;
