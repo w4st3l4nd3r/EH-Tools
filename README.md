@@ -6,6 +6,7 @@ This repository contains networking tools written in modern C++ as part of my pa
 - TCP Echo
 - TCP Multi-client Chatroom
 - TCP File Transfer
+- Raw ICMP Ping
 
 ## Scanning
 - ARP-based Network Scanner
