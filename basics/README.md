@@ -67,3 +67,23 @@ g++ file_transfer_client.cpp -o file_transfer_client
 ```
 
 ![chatroom_server_client_screenshot](file_transfer_server_client_example.jpg)
+
+### 4. Raw ICMP Ping (C++)
+`raw_icmp_ping.cpp`
+
+A command-line based tool that:
+- Sets up a raw socket;
+- Generates an ICMP packet;
+- Sends the packet to Google DNS (8.8.8.8);
+- Captures, parses and displays the response.
+
+**Key Learning:**
+- Packet crafting.
+
+**Usage:**
+```bash
+g++ raw_icmp_ping.cpp -o raw_icmp_ping
+sudo ./raw_icmp_ping
+```
+
+![raw_icmp_ping_screenshot](raw_icmp_ping_example.jpg)
