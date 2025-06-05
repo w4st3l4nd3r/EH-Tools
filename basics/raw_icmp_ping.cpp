@@ -149,16 +149,16 @@ class DestinationSocket {
 
 class ICMPPing {
     private:
-    DestinationSocket destSocket;
+    DestinationSocket destinationSocket;
 
     public:
     ICMPPing(){};
     ~ICMPPing(){
-        destSocket.closeSocket();
+        destinationSocket.closeSocket();
     };
 
     void run() {
-        destSocket.initialize();
+        destinationSocket.initialize();
     }
 };
 
