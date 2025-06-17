@@ -29,7 +29,7 @@ A command-line tool that:
 
 **Key Learning:**
 - Parsing retreived packets;
-- Creating RAW UDP packets while using `setsockopt()`.
+- Raw socket creation and manipulation using `setsockopt()` and `IP_HDRINCL`.
 
 **Usage:**
 ```bash
