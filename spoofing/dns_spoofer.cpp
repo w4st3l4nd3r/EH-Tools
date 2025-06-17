@@ -1,18 +1,17 @@
 //=== DNS SPOOFER ===
 // Listens for DNS requests from local target, captures packet, forges DNS response.
 
+#include <arpa/inet.h>
 #include <array>
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <net/ethernet.h>
+#include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/udp.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <cstring>
-#include <unistd.h>
 #include <sys/socket.h>
-#include <net/ethernet.h>
+#include <unistd.h>
 
 #define DNS_PORT 53
 #define MAX_PACKET_SIZE 65536
