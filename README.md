@@ -13,6 +13,7 @@ This repository contains networking tools written in modern C++ as part of my pa
 
 ## Spoofing
 - MAC Address Changer
+- DNS Spoofer
 
 **Disclaimer:**
 These tools are for educational and testing purposes on networks owned by the operator. Do not use them against systems without explicit permission.
