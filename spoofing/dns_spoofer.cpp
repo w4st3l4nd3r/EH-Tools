@@ -1,6 +1,5 @@
 //=== DNS SPOOFER ===
-// Listens for DNS requests from local target, captures packet, forges DNS response
-// Also spoofs MAC, sends full Ethernet frame.
+// Listens for DNS requests from local target, captures packet, forges DNS response.
 
 #include <array>
 #include <cstdlib>
