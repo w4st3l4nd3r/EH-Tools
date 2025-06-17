@@ -18,3 +18,23 @@ sudo ./mac_changer
 ```
 
 ![mac_changer_creenshot](mac_changer_example.jpg)
+
+### 2. DNS Spoofer
+`dns_spoofer.cpp`
+
+A command-line tool that:
+- Monitors incoming UDP port 53 traffic (DNS queries);
+- Identifies DNS requests for a user-defined domain;
+- Crafts and sends forged DNS A record replies to the victim.
+
+**Key Learning:**
+- Parsing retreived packets;
+- Creating RAW UDP packets while using `setsockopt()`.
+
+**Usage:**
+```bash
+g++ dns_spoofer.cpp -o dns_spoofer
+sudo ./dns_spoofer <target_domain> <spoofed_IP>
+```
+
+![dns_sppoofer_creenshot](dns_spoofer_example.jpg)
