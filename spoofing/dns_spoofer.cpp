@@ -123,7 +123,7 @@ class SpoofedDNSPacket {
         ip->check = 0;
         ip->saddr = requestIP->daddr;
         ip->daddr = requestIP->saddr;
-        ip->check = 0; // Calculate if needed, but not needed often in modern stacks
+        ip->check = 0;
 
         destinationAddress.sin_family = AF_INET;
         destinationAddress.sin_addr.s_addr = ip->daddr;
