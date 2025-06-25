@@ -10,6 +10,7 @@ This repository contains networking tools written in modern C++ as part of my pa
 
 ## Scanning
 - ARP-based Network Scanner
+- Port Scanner
 
 ## Spoofing
 - MAC Address Changer
