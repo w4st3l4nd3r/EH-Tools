@@ -384,7 +384,6 @@ int main(int argc, char* argv[]) {
         std::cout << "Output file: " << scanner.outputFile << std::endl;
     }
 
-    // scanner(targets, useTop1000, useFullScan, enableUDP, grabBanner, outputFile)
     scanner.run();
 
     return 0;
