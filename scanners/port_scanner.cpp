@@ -3,6 +3,7 @@
 // TODO: Add stealth logic / arg
 // TODO: Add ability to specify ports
 // TODO: Add multithreaded banner grabbing as well
+// TODO: Use atomic counter in place of sleep_for() 
 
 #include <arpa/inet.h>
 #include <array>
