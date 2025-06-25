@@ -8,7 +8,7 @@ This repository contains networking tools written in modern C++ as part of my pa
 - TCP File Transfer
 - Raw ICMP Ping
 
-## Scanning
+## Scanners
 - ARP-based Network Scanner
 - Port Scanner
 
