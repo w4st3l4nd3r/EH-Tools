@@ -28,7 +28,7 @@ sudo ./arp_scanner <interface>
 A command-line tool that scans one or more hosts for open TCP/UDP ports by:
 - Accepting a single IP or a file with a list of targets;
 - Scanning top 1000 or full port range using TCP connect() or UDP datagrams;
-- Using a thread pool to speed up scanning;
+- Sped up scanning using a thread pool;
 - Optionally grabbing banners from open TCP ports;
 - Outputting results to console or a .txt file.
 
